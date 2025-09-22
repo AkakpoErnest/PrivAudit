@@ -3,7 +3,7 @@ import { RealDAOFetcher } from '@privaudit/core';
 import { RealSolvencyProver } from '@privaudit/proofs';
 import { AIReportGenerator } from '@privaudit/ai';
 
-// Real API endpoint that fetches actual DAO data and generates real reports
+// Real API endpoint that ONLY fetches actual DAO data - NO MOCK DATA
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -13,144 +13,140 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { daoAddress, etherscanApiKey, aiApiKey } = req.body;
 
     if (!daoAddress) {
-      return res.status(400).json({ error: 'DAO address is required' });
+      return res.status(400).json({ 
+        error: 'DAO address is required',
+        success: false 
+      });
     }
 
-    console.log('🚀 Starting REAL report generation for DAO:', daoAddress);
+    if (!etherscanApiKey && !process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY) {
+      return res.status(400).json({ 
+        error: 'Etherscan API key is required for real data',
+        success: false 
+      });
+    }
 
-    // Step 1: Fetch real treasury data from blockchain (with timeout)
-    console.log('📊 Step 1: Fetching real treasury data...');
-    const daoFetcher = new RealDAOFetcher(
-      'https://ethereum.publicnode.com', // Free public endpoint
-      etherscanApiKey || process.env.ETHERSCAN_API_KEY || 'demo'
-    );
-    
-    // Add timeout to prevent hanging
-    const treasuryData = await Promise.race([
-      daoFetcher.fetchRealTreasuryData(daoAddress),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout fetching treasury data')), 5000)
-      )
-    ]) as any;
-    console.log('✅ Real treasury data fetched:', {
-      assets: treasuryData.assets.length,
-      totalValue: treasuryData.totalValueUSD,
+    console.log('🚀 Starting REAL-ONLY report generation for DAO:', daoAddress);
+
+    // Use multiple RPC providers for better reliability
+    const rpcProviders = [
+      'https://ethereum-rpc.publicnode.com',
+      'https://rpc.ankr.com/eth',
+      'https://eth.llamarpc.com',
+      'https://ethereum.blockpi.network/v1/rpc/public',
+      'https://cloudflare-eth.com'
+    ];
+
+    // Step 1: Fetch REAL treasury data from blockchain
+    console.log('📊 Step 1: Fetching REAL treasury data...');
+    let treasuryData: any = null;
+    let lastError: any = null;
+
+    // Try each RPC provider until one works
+    for (const rpcUrl of rpcProviders) {
+      try {
+        console.log(`🔄 Trying RPC provider: ${rpcUrl}`);
+        const daoFetcher = new RealDAOFetcher(
+          rpcUrl,
+          etherscanApiKey || process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || ''
+        );
+        
+        treasuryData = await daoFetcher.fetchRealTreasuryData(daoAddress);
+        
+        if (treasuryData && treasuryData.assets && treasuryData.assets.length > 0) {
+          console.log('✅ Real treasury data fetched successfully');
+          break;
+        } else {
+          throw new Error('No treasury assets found for this DAO');
+        }
+      } catch (error) {
+        console.warn(`❌ RPC provider ${rpcUrl} failed:`, error);
+        lastError = error;
+        continue;
+      }
+    }
+
+    if (!treasuryData || !treasuryData.assets || treasuryData.assets.length === 0) {
+      throw new Error(`Failed to fetch real treasury data from all providers. Last error: ${lastError?.message || 'No assets found'}`);
+    }
+
+    console.log('📈 REAL Treasury Data Summary:', {
+      daoAddress: treasuryData.daoAddress,
+      assetsFound: treasuryData.assets.length,
+      totalValueUSD: `$${treasuryData.totalValueUSD.toLocaleString()}`,
+      network: treasuryData.network,
       isRealData: treasuryData.isRealData
     });
 
-    // Step 2: Generate real zkSNARK proof (with timeout)
-    console.log('🧮 Step 2: Generating real zkSNARK proof...');
+    // Step 2: Generate REAL zkSNARK proof for solvency
+    console.log('🧮 Step 2: Generating REAL zkSNARK proof...');
     const prover = new RealSolvencyProver();
-    const proofArtifact = await Promise.race([
-      prover.generateRealProof(treasuryData),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout generating proof')), 2000)
-      )
-    ]) as any;
+    const proofArtifact = await prover.generateRealProof(treasuryData);
     console.log('✅ Real proof generated:', {
       provingTime: proofArtifact.metadata.provingTime,
-      isSolvent: proofArtifact.metadata.isSolvent
+      isSolvent: proofArtifact.metadata.isSolvent,
+      circuitUsed: proofArtifact.metadata.circuitName
     });
 
     // Step 3: Verify the proof
-    console.log('🔍 Step 3: Verifying proof...');
+    console.log('🔍 Step 3: Verifying REAL proof...');
     const verificationResult = await prover.verifyRealProof(proofArtifact);
-    console.log('✅ Proof verification result:', verificationResult.isValid);
-
-    // Step 4: Generate real AI report (with timeout)
-    console.log('🤖 Step 4: Generating AI-powered report...');
-    const aiGenerator = new AIReportGenerator(aiApiKey || 'your-ai-api-key');
-    const reportData = await Promise.race([
-      aiGenerator.generateReport(treasuryData, verificationResult.isValid),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout generating AI report')), 3000)
-      )
-    ]) as any;
-    console.log('✅ Real AI report generated:', {
-      recommendations: reportData.recommendations.length,
-      netWorth: reportData.metrics.netWorth
+    console.log('✅ Proof verification result:', {
+      isValid: verificationResult.isValid,
+      verificationTime: verificationResult.verificationTime
     });
 
-    // Return the complete real report
-    res.status(200).json({
+    // Step 4: Generate AI-powered report with REAL data
+    console.log('🤖 Step 4: Generating AI report with REAL data...');
+    const aiGenerator = new AIReportGenerator(aiApiKey || process.env.AI_API_KEY || '');
+    const reportData = await aiGenerator.generateReport(treasuryData, verificationResult.isValid);
+    console.log('✅ AI report generated with real data:', {
+      recommendations: reportData.recommendations.length,
+      netWorth: `$${reportData.metrics.netWorth.toLocaleString()}`,
+      riskAssessment: reportData.riskAssessment
+    });
+
+    // Step 5: Return the complete REAL report
+    const completeReport = {
       success: true,
       reportData,
       proofArtifact,
       verificationResult,
       treasuryData: {
         ...treasuryData,
-        assets: treasuryData.assets.slice(0, 10) // Limit for response size
+        // Include full asset list for real data
+        assets: treasuryData.assets
       },
       metadata: {
         isRealData: true,
-        dataSource: 'Blockchain API',
-        proofType: 'zkSNARK',
-        aiProvider: 'Advanced AI',
-        timestamp: new Date().toISOString()
-      }
-    });
-
-  } catch (error) {
-    console.error('❌ Real report generation failed:', error);
-    
-    // Provide immediate demo data fallback for better UX
-    console.log('🔄 Providing demo data fallback...');
-    
-    const demoFallback = {
-      success: true,
-      reportData: {
-        metrics: {
-          totalAssets: 15000000,
-          totalLiabilities: 0,
-          netWorth: 15000000,
-          solvencyRatio: 100,
-          runwayMonths: 48,
-          assetDiversification: {
-            highConcentration: false,
-            topAssetPercentage: 35,
-            numberOfAssets: 8
-          },
-          riskMetrics: {
-            concentrationRisk: 'Medium',
-            volatilityRisk: 'Low',
-            liquidityRisk: 'Low'
-          }
-        },
-        recommendations: [
-          'Treasury shows excellent health with strong solvency',
-          'Consider diversifying into additional stablecoins',
-          'Maintain current runway of 48+ months for stability',
-          'Monitor market conditions for optimal asset allocation'
-        ],
-        summary: 'Demo: Treasury demonstrates strong financial health',
-        generatedAt: new Date().toISOString()
-      },
-      proofArtifact: {
-        proof: 'demo_proof_data',
-        metadata: { isSolvent: true, provingTime: '500ms' }
-      },
-      verificationResult: { isValid: true },
-      treasuryData: {
-        daoAddress: req.body.daoAddress,
-        totalValueUSD: 15000000,
-        assets: [
-          { symbol: 'ETH', balance: 5000, valueUSD: 8000000 },
-          { symbol: 'USDC', balance: 3000000, valueUSD: 3000000 },
-          { symbol: 'DAI', balance: 2000000, valueUSD: 2000000 },
-          { symbol: 'UNI', balance: 100000, valueUSD: 2000000 }
-        ],
-        isRealData: false
-      },
-      metadata: {
-        isRealData: false,
-        dataSource: 'Demo Data (API Error)',
-        proofType: 'Demo zkSNARK',
-        aiProvider: 'Demo AI',
+        dataSource: 'Live Blockchain Data',
+        proofType: 'Real zkSNARK',
+        aiProvider: 'Real AI Analysis',
         timestamp: new Date().toISOString(),
-        fallbackReason: error instanceof Error ? error.message : 'API timeout'
+        processingTime: Date.now(),
+        daoAddress: treasuryData.daoAddress,
+        etherscanVerified: true
       }
     };
+
+    console.log('🎉 REAL report generation completed successfully!');
+    return res.status(200).json(completeReport);
+
+  } catch (error) {
+    console.error('❌ REAL report generation failed:', error);
     
-    res.status(200).json(demoFallback);
+    // NO FALLBACK - Return error instead of mock data
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to generate real treasury report',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      suggestions: [
+        'Verify the DAO address is correct and has token activity',
+        'Ensure Etherscan API key is valid and has sufficient quota',
+        'Try again in a few minutes if rate limits are hit',
+        'Check that the DAO has public treasury data available'
+      ],
+      timestamp: new Date().toISOString()
+    });
   }
 }
