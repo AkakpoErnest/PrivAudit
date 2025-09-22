@@ -1,0 +1,29 @@
+{
+  "name": "privaudit",
+  "version": "1.0.0",
+  "description": "Privacy-preserving treasury reports for DAOs",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "prove": "cd packages/proofs && npm run prove",
+    "verify": "cd packages/proofs && npm run verify",
+    "generate-report": "cd packages/ai && npm run generate-report",
+    "demo": "ts-node scripts/demo.ts"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.12",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

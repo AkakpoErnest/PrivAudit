@@ -1,0 +1,22 @@
+{
+  "name": "@privaudit/core",
+  "version": "1.0.0",
+  "description": "Core Midnight.js adapters for private data ingestion",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "ethers": "^6.15.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  }
+}

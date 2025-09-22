@@ -1,0 +1,23 @@
+{
+  "name": "@privaudit/proofs",
+  "version": "1.0.0",
+  "description": "Zero-knowledge proofs for treasury solvency verification",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "prove": "node dist/cli/prove.js",
+    "verify": "node dist/cli/verify.js"
+  },
+  "dependencies": {
+    "snarkjs": "^0.7.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  }
+}

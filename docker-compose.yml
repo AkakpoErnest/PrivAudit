@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  privaudit-web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MIDNIGHT_WALLET_PATH=${MIDNIGHT_WALLET_PATH}
+      - MIDNIGHT_PRIVATE_KEY=${MIDNIGHT_PRIVATE_KEY}
+    volumes:
+      - ./artifacts:/app/artifacts
+    depends_on:
+      - redis
+      - postgres
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=privaudit
+      - POSTGRES_USER=privaudit
+      - POSTGRES_PASSWORD=privaudit_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  ipfs:
+    image: ipfs/kubo:latest
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+      - "8080:8080"
+    volumes:
+      - ipfs_data:/data/ipfs
+
+volumes:
+  redis_data:
+  postgres_data:
+  ipfs_data:

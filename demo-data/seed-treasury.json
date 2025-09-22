@@ -1,0 +1,99 @@
+{
+  "daoConfigs": [
+    {
+      "address": "0x1234567890123456789012345678901234567890",
+      "name": "Demo DAO",
+      "network": "ethereum",
+      "description": "A sample DAO for demonstration purposes"
+    },
+    {
+      "address": "0x2345678901234567890123456789012345678901",
+      "name": "Test Treasury DAO",
+      "network": "polygon",
+      "description": "Another test DAO with different asset allocation"
+    }
+  ],
+  "treasurySnapshots": [
+    {
+      "daoAddress": "0x1234567890123456789012345678901234567890",
+      "timestamp": 1704067200000,
+      "assets": [
+        {
+          "address": "0xA0b86a33E6441b8c4C8C0C8C0C8C0C8C0C8C0C8C",
+          "symbol": "USDC",
+          "name": "USD Coin",
+          "balance": "1000000000000",
+          "decimals": 6,
+          "priceUSD": 1.0,
+          "valueUSD": 1000000,
+          "type": "token",
+          "contractType": "erc20"
+        },
+        {
+          "address": "0xB1c97a44F7551b9d5D1D1D1D1D1D1D1D1D1D1D1D",
+          "symbol": "ETH",
+          "name": "Ethereum",
+          "balance": "500000000000000000",
+          "decimals": 18,
+          "priceUSD": 2000,
+          "valueUSD": 1000000,
+          "type": "token",
+          "contractType": "erc20"
+        },
+        {
+          "address": "0xC2d88b55G8662c0e6E2E2E2E2E2E2E2E2E2E2E2E",
+          "symbol": "WBTC",
+          "name": "Wrapped Bitcoin",
+          "balance": "100000000",
+          "decimals": 8,
+          "priceUSD": 30000,
+          "valueUSD": 300000,
+          "type": "token",
+          "contractType": "erc20"
+        }
+      ],
+      "liabilities": [
+        {
+          "address": "0xD3e99c66H9773d1f7F3F3F3F3F3F3F3F3F3F3F3F",
+          "symbol": "USDC",
+          "name": "USD Coin",
+          "balance": "200000000000",
+          "decimals": 6,
+          "priceUSD": 1.0,
+          "valueUSD": 200000,
+          "type": "debt",
+          "contractType": "erc20"
+        },
+        {
+          "address": "0xE4f00d77I0884e2g8G4G4G4G4G4G4G4G4G4G4G4G",
+          "symbol": "ETH",
+          "name": "Ethereum",
+          "balance": "50000000000000000",
+          "decimals": 18,
+          "priceUSD": 2000,
+          "valueUSD": 100000,
+          "type": "vesting",
+          "contractType": "erc20"
+        }
+      ],
+      "totalValueUSD": 2300000,
+      "network": "ethereum"
+    }
+  ],
+  "proofArtifacts": [
+    {
+      "daoAddress": "0x1234567890123456789012345678901234567890",
+      "proofHash": "0x1a2b3c4d5e6f7890abcdef1234567890abcdef12",
+      "timestamp": 1704067200000,
+      "verified": true,
+      "metadata": {
+        "circuitVersion": "1.0.0",
+        "provingTime": 1250,
+        "verificationTime": 180,
+        "totalAssets": "2300000000000000000000000",
+        "totalLiabilities": "300000000000000000000000",
+        "isSolvent": true
+      }
+    }
+  ]
+}
