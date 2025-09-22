@@ -16,6 +16,77 @@ export default function Home() {
   const [showDAOSelector, setShowDAOSelector] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingStep, setLoadingStep] = useState('');
+  
+  const handleDownloadPDF = async () => {
+    if (!reportData || !selectedDAO) return;
+    
+    try {
+      console.log('📄 Downloading PDF report...');
+      
+      const response = await fetch('/api/test-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reportData,
+          treasuryData: reportData,
+          selectedDAO
+        })
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `treasury-report-${selectedDAO.address.slice(0, 8)}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        console.log('✅ PDF downloaded successfully');
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.details || 'Failed to generate PDF');
+      }
+    } catch (error) {
+      console.error('❌ PDF download failed:', error);
+      alert(`PDF download failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleShareReport = async () => {
+    if (!reportData || !selectedDAO) return;
+    
+    try {
+      const shareData = {
+        title: `PrivAudit Treasury Report - ${selectedDAO.name || selectedDAO.address.slice(0, 8)}`,
+        text: `Treasury Analysis: $${reportData.metadata?.totalAssets?.toLocaleString() || 'N/A'} total assets, ${reportData.reportData?.riskAssessment || 'Unknown'} risk level`,
+        url: window.location.href
+      };
+
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        console.log('✅ Report shared successfully');
+      } else {
+        // Fallback: copy to clipboard
+        const textToShare = `${shareData.title}\n${shareData.text}\n${shareData.url}`;
+        await navigator.clipboard.writeText(textToShare);
+        alert('Report details copied to clipboard!');
+        console.log('✅ Report copied to clipboard');
+      }
+    } catch (error) {
+      console.error('❌ Share failed:', error);
+      // Final fallback: copy URL
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Report URL copied to clipboard!');
+      } catch (clipboardError) {
+        alert('Sharing not available. Please copy the URL manually.');
+      }
+    }
+  };
 
   const handleGenerateReport = async () => {
     setIsGenerating(true);
@@ -30,11 +101,11 @@ export default function Home() {
       setLoadingProgress(10);
       setLoadingStep('Connecting to blockchain...');
       
-      // Call the real API endpoint
+      // Call the simple working API endpoint
       setLoadingProgress(25);
       setLoadingStep('Fetching treasury data...');
       
-      const response = await fetch('/api/generate-real-report', {
+      const response = await fetch('/api/generate-simple-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,55 +143,22 @@ export default function Home() {
       setLoadingStep('Report complete!');
       
       setTimeout(() => {
-        const realReport = result.reportData;
-        setReportData(realReport);
-        setProofVerified(result.verificationResult.isValid);
+        // Set the complete real data
+        setReportData(result);
+        setProofVerified(result.verificationResult?.isValid || false);
+        console.log('✅ Real report data set successfully');
       }, 500);
       
     } catch (err) {
-      console.warn('Real API failed, falling back to demo data:', err);
-      
-      // Fallback to demo data if real API fails
-      const mockReport = {
-        daoName: 'Demo DAO (Fallback)',
-        daoAddress: '0x1234...5678',
-        reportDate: new Date().toISOString().split('T')[0],
-        metrics: {
-          totalAssets: 1800000,
-          totalLiabilities: 200000,
-          netWorth: 1600000,
-          solvencyRatio: 9.0,
-          runwayMonths: 18.0,
-          assetDiversification: {
-            stablecoins: 55.6,
-            crypto: 44.4,
-            nfts: 0,
-            lpTokens: 0,
-            other: 0
-          },
-          riskMetrics: {
-            concentrationRisk: 'medium',
-            volatilityRisk: 'medium',
-            liquidityRisk: 'low',
-            counterpartyRisk: 'low'
-          }
-        },
-        proofVerified: true,
-        proofHash: '0x' + Math.random().toString(16).substr(2, 8),
-        recommendations: [
-          'Consider diversifying into more stable assets to reduce volatility risk',
-          'Implement automated treasury management strategies',
-          'Set up regular solvency monitoring and alerts',
-          'Consider hedging strategies for crypto exposure'
-        ]
-      };
-      
-      setReportData(mockReport);
-      setProofVerified(true);
+      console.error('❌ Real report generation failed:', err);
+      setError(err instanceof Error ? err.message : 'Failed to generate real report. Please check the DAO address and try again.');
     } finally {
       setIsGenerating(false);
+      setLoadingProgress(0);
+      setLoadingStep('');
     }
   };
+
 
   const handleWalletConnected = (address: string) => {
     setWalletAddress(address);
@@ -352,6 +390,36 @@ export default function Home() {
                       <li>• Data integrity without exposing sensitive details</li>
                       <li>• Report authenticity and tamper-proof verification</li>
                     </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Export & Share Actions */}
+              <div className="card">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Export & Share</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Download PDF or share this treasury report</p>
+                  </div>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={handleShareReport}
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                      </svg>
+                      Share
+                    </button>
+                    <button
+                      onClick={handleDownloadPDF}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Download PDF
+                    </button>
                   </div>
                 </div>
               </div>

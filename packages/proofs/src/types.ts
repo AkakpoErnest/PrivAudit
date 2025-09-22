@@ -3,22 +3,29 @@ export interface TreasuryData {
   liabilities: Liability[];
   timestamp: number;
   daoAddress: string;
+  totalValueUSD?: number;
+  network?: string;
 }
 
 export interface Asset {
-  address: string;
+  address?: string;
   symbol: string;
-  amount: bigint;
-  decimals: number;
-  type: 'token' | 'nft' | 'lp' | 'other';
+  amount?: bigint;
+  balance?: string;
+  balanceFormatted?: string;
+  valueUSD?: number;
+  decimals?: number;
+  name?: string;
+  type?: 'token' | 'nft' | 'lp' | 'other';
 }
 
 export interface Liability {
-  address: string;
+  address?: string;
   symbol: string;
-  amount: bigint;
-  decimals: number;
-  type: 'debt' | 'vesting' | 'commitment' | 'other';
+  amount?: bigint;
+  valueUSD?: number;
+  decimals?: number;
+  type?: 'debt' | 'vesting' | 'commitment' | 'other';
 }
 
 export interface SolvencyProof {
@@ -40,11 +47,12 @@ export interface SolvencyProof {
 export interface ProofArtifact {
   proof: SolvencyProof;
   metadata: {
+    circuitName?: string;
     circuitVersion: string;
     provingTime: number;
     verificationTime: number;
-    totalAssets: string;
-    totalLiabilities: string;
+    totalAssets: number;
+    totalLiabilities: number;
     isSolvent: boolean;
   };
   ipfsHash?: string;
