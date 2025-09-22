@@ -224,7 +224,7 @@ export default function Home() {
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: 'url(/images/hero-bg.jpeg)',
+              backgroundImage: 'url(/images/new-background.jpeg)',
               filter: 'brightness(0.3)'
             }}
           />
@@ -580,7 +580,7 @@ export default function Home() {
                 <div className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                   <div className="relative overflow-hidden rounded-xl mb-6">
                     <img 
-                      src="/images/hero-bg.jpeg" 
+                      src="/images/new-background.jpeg" 
                       alt="AI-Powered Reports"
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                     />
