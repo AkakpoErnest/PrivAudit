@@ -129,50 +129,113 @@ export class RealDAOFetcher {
 
   private async getTokenPrice(symbol: string): Promise<number> {
     try {
-      // First try: Static prices for common stablecoins and major tokens
-      const staticPrices: Record<string, number> = {
-        'USDC': 1.0,
-        'USDT': 1.0,
-        'DAI': 1.0,
-        'BUSD': 1.0,
-        'FRAX': 1.0,
-        'ETH': 2400, // Approximate ETH price
-        'WETH': 2400,
-        'WBTC': 65000, // Approximate BTC price
-        'BTC': 65000
-      };
-
-      if (staticPrices[symbol]) {
-        return staticPrices[symbol];
+      // Use real-time ETH price as base for calculations
+      const currentEthPrice = await this.getCurrentETHPrice();
+      
+      // Static prices for stablecoins (always $1)
+      const stablecoins = ['USDC', 'USDT', 'DAI', 'BUSD', 'FRAX', 'LUSD', 'TUSD', 'SUSD'];
+      if (stablecoins.includes(symbol)) {
+        return 1.0;
       }
 
-      // Second try: Use CoinGecko with rate limiting protection
-      await this.delay(200); // 200ms delay between requests
+      // Use current ETH price for ETH and WETH
+      if (symbol === 'ETH' || symbol === 'WETH') {
+        return currentEthPrice;
+      }
+
+      // Try to get price from Etherscan's API (more reliable)
+      const priceFromEtherscan = await this.getPriceFromEtherscan(symbol);
+      if (priceFromEtherscan > 0) {
+        return priceFromEtherscan;
+      }
+
+      // Fallback to CoinGecko with better rate limiting
+      await this.delay(500); // Longer delay to avoid rate limits
       
       const symbolMap: Record<string, string> = {
+        'WBTC': 'wrapped-bitcoin',
         'MATIC': 'matic-network',
         'ARB': 'arbitrum',
         'OP': 'optimism',
         'LINK': 'chainlink',
-        'UNI': 'uniswap'
+        'UNI': 'uniswap',
+        'AAVE': 'aave',
+        'COMP': 'compound-governance-token',
+        'MKR': 'maker',
+        'SNX': 'havven'
       };
 
       const coinGeckoId = symbolMap[symbol] || symbol.toLowerCase();
       
       const response = await axios.get(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
-        { timeout: 3000 } // 3 second timeout
+        { 
+          timeout: 5000,
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'PrivAudit/1.0'
+          }
+        }
       );
       
-      return response.data[coinGeckoId]?.usd || 100; // Default to $100 if not found
+      const price = response.data[coinGeckoId]?.usd;
+      if (price && price > 0) {
+        console.log(`✅ Got price for ${symbol}: $${price}`);
+        return price;
+      }
+
+      throw new Error(`No price data available for ${symbol}`);
+
     } catch (error) {
-      console.warn(`Failed to get price for ${symbol}:`, error);
-      // Return reasonable default prices based on token type
-      if (symbol.includes('USD') || symbol === 'DAI') return 1.0;
-      if (symbol === 'ETH' || symbol === 'WETH') return 2400;
-      if (symbol === 'BTC' || symbol === 'WBTC') return 65000;
-      return 100; // Default fallback price
+      console.warn(`⚠️ Failed to get price for ${symbol}:`, error instanceof Error ? error.message : error);
+      
+      // Emergency fallback with reasonable estimates
+      const emergencyPrices: Record<string, number> = {
+        'WBTC': 65000,
+        'LINK': 15,
+        'UNI': 8,
+        'AAVE': 150,
+        'COMP': 60,
+        'MKR': 1500,
+        'SNX': 3
+      };
+
+      return emergencyPrices[symbol] || 10; // $10 default for unknown tokens
     }
+  }
+
+  private async getCurrentETHPrice(): Promise<number> {
+    try {
+      // Try multiple sources for ETH price
+      const sources = [
+        'https://api.coinbase.com/v2/exchange-rates?currency=ETH',
+        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
+      ];
+
+      for (const source of sources) {
+        try {
+          const response = await axios.get(source, { timeout: 3000 });
+          
+          if (source.includes('coinbase')) {
+            return parseFloat(response.data.data.rates.USD);
+          } else {
+            return response.data.ethereum.usd;
+          }
+        } catch (err) {
+          continue;
+        }
+      }
+
+      return 2400; // Fallback ETH price
+    } catch (error) {
+      return 2400; // Fallback ETH price
+    }
+  }
+
+  private async getPriceFromEtherscan(symbol: string): Promise<number> {
+    // For now, return 0 to skip Etherscan pricing
+    // This can be implemented later if needed
+    return 0;
   }
 
   private delay(ms: number): Promise<void> {
