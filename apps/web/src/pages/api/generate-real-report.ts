@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Step 1: Fetch real treasury data from blockchain (with timeout)
     console.log('📊 Step 1: Fetching real treasury data...');
     const daoFetcher = new RealDAOFetcher(
-      'https://eth-mainnet.g.alchemy.com/v2/demo', // Free Alchemy endpoint
+      'https://ethereum.publicnode.com', // Free public endpoint
       etherscanApiKey || process.env.ETHERSCAN_API_KEY || 'demo'
     );
     
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const treasuryData = await Promise.race([
       daoFetcher.fetchRealTreasuryData(daoAddress),
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout fetching treasury data')), 10000)
+        setTimeout(() => reject(new Error('Timeout fetching treasury data')), 5000)
       )
     ]) as any;
     console.log('✅ Real treasury data fetched:', {
@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const proofArtifact = await Promise.race([
       prover.generateRealProof(treasuryData),
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout generating proof')), 5000)
+        setTimeout(() => reject(new Error('Timeout generating proof')), 2000)
       )
     ]) as any;
     console.log('✅ Real proof generated:', {
@@ -63,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const reportData = await Promise.race([
       aiGenerator.generateReport(treasuryData, verificationResult.isValid),
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout generating AI report')), 8000)
+        setTimeout(() => reject(new Error('Timeout generating AI report')), 3000)
       )
     ]) as any;
     console.log('✅ Real AI report generated:', {

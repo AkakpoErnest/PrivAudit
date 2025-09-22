@@ -437,7 +437,7 @@ export default function Home() {
                             />
                           </div>
                           <span className="text-sm font-medium text-gray-900 w-12 text-right">
-                            {(value as number).toFixed(1)}%
+                            {typeof value === 'number' ? value.toFixed(1) : '0.0'}%
                           </span>
                         </div>
                       </div>
