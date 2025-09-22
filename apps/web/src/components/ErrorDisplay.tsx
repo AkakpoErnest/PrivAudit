@@ -14,21 +14,23 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   onDismiss
 }) => {
   return (
-    <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mx-4 max-w-2xl mx-auto">
+    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 mx-4 max-w-2xl mx-auto">
       <div className="flex items-start space-x-4">
         {/* Error Icon */}
         <div className="flex-shrink-0">
-          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-            <span className="text-red-600 text-2xl">⚠️</span>
+          <div className="w-12 h-12 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center">
+            <svg className="w-6 h-6 text-red-600 dark:text-red-300" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
           </div>
         </div>
         
         {/* Error Content */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-red-800 mb-2">
+          <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
             {title}
           </h3>
-          <p className="text-red-700 mb-4 leading-relaxed">
+          <p className="text-red-700 dark:text-red-300 mb-4 leading-relaxed">
             {message}
           </p>
           
@@ -46,7 +48,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
             {onDismiss && (
               <button
                 onClick={onDismiss}
-                className="bg-white hover:bg-gray-50 text-red-600 font-medium px-4 py-2 rounded-lg border border-red-200 transition-colors duration-200"
+                className="bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-red-600 dark:text-red-300 font-medium px-4 py-2 rounded-lg border border-red-200 dark:border-red-700 transition-colors duration-200"
               >
                 Dismiss
               </button>

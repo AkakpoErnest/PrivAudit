@@ -13,7 +13,7 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
 }) => {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="h-16 w-16 bg-gradient-to-r from-navy-600 to-accent-600 rounded-full mx-auto mb-4 flex items-center justify-center animate-pulse">
@@ -21,19 +21,19 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">{message}</h3>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{message}</h3>
           {step && (
-            <p className="text-sm text-gray-600">{step}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{step}</p>
           )}
         </div>
 
         {/* Progress Bar */}
         <div className="mb-6">
-          <div className="flex justify-between text-xs text-gray-600 mb-2">
+          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300 mb-2">
             <span>Progress</span>
             <span>{progress}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
           <div 
             className="bg-gradient-to-r from-navy-600 to-accent-600 h-2 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}

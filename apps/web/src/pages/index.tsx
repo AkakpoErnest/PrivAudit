@@ -149,7 +149,7 @@ export default function Home() {
         <meta name="theme-color" content="#1e3a8a" />
       </Head>
 
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         {/* Loading Animation */}
         {isGenerating && (
           <LoadingAnimation 
@@ -175,7 +175,7 @@ export default function Home() {
         )}
 
         {/* Header */}
-        <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-navy-200 sticky top-0 z-50">
+        <header className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-lg border-b border-navy-200 dark:border-gray-700 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -190,13 +190,13 @@ export default function Home() {
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-accent-600 bg-clip-text text-transparent">
                     PrivAudit
                   </h1>
-                  <p className="text-xs text-navy-600 font-medium">
+                  <p className="text-xs text-navy-600 dark:text-gray-300 font-medium">
                     Privacy-Preserving Treasury Reports
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-6">
-                <div className="hidden md:flex items-center space-x-4 text-sm text-navy-600">
+                <div className="hidden md:flex items-center space-x-4 text-sm text-navy-600 dark:text-gray-300">
                   <span className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-accent-500 rounded-full animate-pulse"></div>
                     <span>Live</span>
@@ -512,22 +512,22 @@ export default function Home() {
           </section>
         )}
 
-        {/* Features Section */}
-        {!reportData && (
-          <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
+          {/* Features Section */}
+          {!reportData && (
+            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
-                <h3 className="text-4xl font-bold text-gray-900 mb-4">
+                <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                   How PrivAudit Works
                 </h3>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
                   A complete privacy-preserving treasury analysis pipeline built for the decentralized future
                 </p>
               </div>
               
               <div className="grid lg:grid-cols-3 gap-8">
                 {/* Feature 1 */}
-                <div className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                <div className="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                   <div className="relative overflow-hidden rounded-xl mb-6">
                     <img 
                       src="/images/security-concept.jpeg" 
@@ -543,16 +543,16 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <h4 className="text-2xl font-bold text-gray-900 mb-3">
+                  <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                     Private Data Ingestion
                   </h4>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                     Securely fetch DAO treasury data using Midnight.js and Etherscan APIs without exposing individual wallet details or sensitive financial information.
                   </p>
                 </div>
 
                 {/* Feature 2 */}
-                <div className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                <div className="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                   <div className="relative overflow-hidden rounded-xl mb-6">
                     <img 
                       src="/images/blockchain-tech.jpeg" 
@@ -568,16 +568,16 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <h4 className="text-2xl font-bold text-gray-900 mb-3">
+                  <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                     Zero-Knowledge Proofs
                   </h4>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                     Generate zkSNARK proofs that verify solvency (assets ≥ liabilities) without revealing sensitive financial information or individual transaction details.
                   </p>
                 </div>
 
                 {/* Feature 3 */}
-                <div className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                <div className="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                   <div className="relative overflow-hidden rounded-xl mb-6">
                     <img 
                       src="/images/new-background.jpeg" 
@@ -593,10 +593,10 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <h4 className="text-2xl font-bold text-gray-900 mb-3">
+                  <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                     AI-Powered Reports
                   </h4>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                     Transform metrics into comprehensive financial reports with actionable insights and recommendations powered by advanced AI.
                   </p>
                 </div>
