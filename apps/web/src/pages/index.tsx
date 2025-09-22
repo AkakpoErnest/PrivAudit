@@ -471,10 +471,10 @@ export default function Home() {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-gray-700">
                       The treasury analysis reveals a <strong>solvent position</strong> with a 
-                      {reportData.metrics.solvencyRatio.toFixed(1)}:1 assets-to-liabilities ratio. 
+                      {typeof reportData.metrics.solvencyRatio === 'number' ? reportData.metrics.solvencyRatio.toFixed(1) : '1.0'}:1 assets-to-liabilities ratio. 
                       The DAO maintains a runway of <strong>{reportData.metrics.runwayMonths} months</strong> 
                       based on current burn rate assumptions. Asset diversification shows{' '}
-                      <strong>{reportData.metrics.assetDiversification.stablecoins.toFixed(1)}%</strong> 
+                      <strong>{typeof reportData.metrics.assetDiversification.stablecoins === 'number' ? reportData.metrics.assetDiversification.stablecoins.toFixed(1) : '0.0'}%</strong> 
                       allocation to stable assets, providing a balanced risk profile.
                     </p>
                   </div>

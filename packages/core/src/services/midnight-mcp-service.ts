@@ -163,3 +163,4 @@ export class MidnightMCPService {
     console.log('🔌 Disconnected from Midnight MCP');
   }
 }
+

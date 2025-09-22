@@ -260,3 +260,4 @@ Provide specific, actionable recommendations for treasury management based on th
     return `DAO ${address.slice(0, 8)}...`;
   }
 }
+

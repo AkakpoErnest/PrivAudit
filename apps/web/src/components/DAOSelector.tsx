@@ -169,3 +169,4 @@ export function DAOSelector({ walletAddress, onDAOSelected }: DAOSelectorProps) 
     </div>
   );
 }
+
