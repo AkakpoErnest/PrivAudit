@@ -1,0 +1,19 @@
+{
+  "name": "privaudit",
+  "version": 2,
+  "public": false,
+  "github": {
+    "silent": true
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_ETHERSCAN_API_KEY": "@etherscan_api_key",
+      "NEXT_PUBLIC_AI_API_KEY": "@ai_api_key"
+    }
+  },
+  "functions": {
+    "apps/web/src/pages/api/**/*.ts": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
